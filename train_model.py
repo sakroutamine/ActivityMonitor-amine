@@ -3,40 +3,12 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import joblib
 
-# Prepare Dataset with provided data
-data = {
-    "domain_name": [
-        # Productive sites
-        "canvas.tamu.edu", "github.com", "stackoverflow.com", "leetcode.com",
-        "coursera.org", "udemy.com", "pluralsight.com", "kaggle.com", "jira.com",
-        "asana.com", "trello.com", "google.com", "drive.google.com", "scholar.google.com",
-        "pubmed.ncbi.nlm.nih.gov", "ieee.org", "acm.org", "jupyter.org", "w3schools.com",
-        "mdn.io", "developer.mozilla.org", "docs.python.org", "medium.com", "dev.to",
-        "freecodecamp.org", "hackerrank.com", "codecademy.com", "microsoft.com",
-        "apple.com", "oracle.com", "www.linkedin.com", "indeed.com", "glassdoor.com",
-        "chat.openai.com",
-        
-        # Unproductive sites
-        "espn.com", "goal.com", "bleacherreport.com", "facebook.com",
-        "instagram.com", "twitter.com", "tiktok.com", "9gag.com", "reddit.com", "4chan.org",
-        "buzzfeed.com", "mashable.com", "imgur.com", "netflix.com", "hulu.com", "disneyplus.com",
-        "youtube.com", "vimeo.com", "dailymotion.com", "twitch.tv", "steam.com", "epicgames.com",
-        "battle.net", "pinterest.com", "snapchat.com", "whatsapp.com", "telegram.org", "messenger.com",
-        "bing.com", "yahoo.com", "craigslist.org", "spotify.com", "soundcloud.com", "last.fm",
-        "pandora.com", "hbomax.com"
-    ],
-    "is_productive": [
-        # Labels for productive (1) and unproductive (0) sites
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    ],
-}
-
-# Create DataFrame
-df = pd.DataFrame(data)
+# Read dataset from CSV file
+file_path = 'productivity_data.csv'
+df = pd.read_csv(file_path)
 
 # Encode the domain_name column
 encoder = LabelEncoder()
@@ -56,9 +28,19 @@ clf.fit(X_train, y_train)
 # Predict on the test set
 y_pred = clf.predict(X_test)
 
-# Calculate accuracy
+# Calculate evaluation metrics
 accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+# Print metrics
 print("Accuracy:", accuracy)
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1 Score:", f1)
+print("Confusion Matrix:\n", conf_matrix)
 
 # Save the model and encoder
 joblib.dump(clf, 'trained_logistic_model.pkl')
