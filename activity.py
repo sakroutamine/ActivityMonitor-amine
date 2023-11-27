@@ -46,6 +46,14 @@ def Finish(complete, uncomplete):
 clf = joblib.load('trained_logistic_model.pkl')
 encoder = joblib.load('domain_encoder.pkl')
 
+# Loading CSV data
+csv_file_path = 'productivity_data.csv'
+try:
+    existing_data = pd.read_csv(csv_file_path)
+except FileNotFoundError:
+    existing_data = pd.DataFrame(columns=['domain_name', 'is_productive'])
+
+
 # Phase 3: Initialize Variables
 active_window_name, current_tab = "", ""
 start_window, start_tab, productive, unproductive = 0, 0 , 0, 0
@@ -53,6 +61,8 @@ rough_tab_lst, visited_websites, website_productivity, windows, tab_time_lst, wi
 timer = int(input("Timer in seconds: "))
 end_time = time.time() + timer
 new_domains = {}
+user_defined_productivity = {}
+
 # New Phase 3.1: Initialize Productivity Variables
 
 
@@ -76,14 +86,35 @@ while time.time() < end_time:
             rough_tab_lst.append(current_tab)
             visited_websites.append(domain_name)
 
-            if domain_name in encoder.classes_:
+            # Check if domain is not in the DataFrame and get user input
+            if domain_name not in existing_data['domain_name'].values:
+                user_input = input(f"Is the website {domain_name} productive? (yes/no): ").strip().lower()
+                is_productive = 1 if user_input == 'yes' else 0
+                user_defined_productivity[domain_name] = is_productive
+                new_row = pd.DataFrame({'domain_name': [domain_name], 'is_productive': [is_productive]})
+                existing_data = pd.concat([existing_data, new_row], ignore_index=True)
+                existing_data.to_csv(csv_file_path, index=False)
+
+            # Determine the productivity based on user input, existing data, or model prediction
+            if domain_name in user_defined_productivity:
+                is_productive = user_defined_productivity[domain_name]
+                source = 'user input'
+            elif domain_name in existing_data['domain_name'].values:
+                is_productive = existing_data[existing_data['domain_name'] == domain_name]['is_productive'].iloc[0]
+                source = 'CSV data'
+            elif domain_name in encoder.classes_:
                 domain_encoded = encoder.transform([domain_name])[0]
-                prediction = clf.predict([[domain_encoded]])
+                is_productive = clf.predict([[domain_encoded]])[0]
+                source = 'model prediction'
             else:
                 print(f"Skipping prediction for unknown domain: {domain_name}")
+                continue
+            
+            # Append the productivity status
+            website_productivity.append('productive' if is_productive == 1 else 'unproductive')
+            print(f"Domain: {domain_name}, Productivity: {'productive' if is_productive == 1 else 'unproductive'}, Source: {source}")
 
-            website_productivity.append('productive' if prediction[0] == 1 else 'unproductive')
-
+        
             end_tab = time.perf_counter()
             result_tab = (end_tab - start_tab)
             tab_time_lst.append(result_tab)
@@ -102,6 +133,12 @@ while time.time() < end_time:
 
     time.sleep(1)
 
+# After the data collection loop
+# for i, website in enumerate(visited_websites):
+#     if website in user_defined_productivity:
+#         website_productivity[i] = 'productive' if user_defined_productivity[website] == 1 else 'unproductive'
+
+
 # Phase 5: Data Processing for Window
 del windows_time_lst[0]
 last_window = timer - sum(windows_time_lst)
@@ -119,17 +156,10 @@ for website, prod in zip(visited_websites, website_productivity):
 # Phase 7: Data Processing for Tabs
 if len(tab_time_lst) > 0:
     del tab_time_lst[0]
-    print(f"Safari Time: {Window_df['Safari']}")
-    print(f"Sum of Time: {sum(tab_time_lst)}")
-    last_tab = Window_df['Safari'] - sum(tab_time_lst)
+    last_tab = abs(Window_df['Safari'] - sum(tab_time_lst))
     tab_time_lst.append(last_tab)
     
 tab_lst = [urlparse(i).netloc for i in rough_tab_lst]
-
-print(f"Tab Time List: {tab_time_lst}")
-print(f"Tab Time Len List: {len(tab_time_lst)}")
-print(f"Tab List: {tab_lst}")
-print(f"Tab Len List: {len(tab_lst)}")
 
 if len(tab_lst) == len(tab_time_lst):
     Tab_df = pd.DataFrame({'Safari Tabs': tab_lst, 'Time Spent on Each Tab': tab_time_lst})
@@ -137,15 +167,11 @@ if len(tab_lst) == len(tab_time_lst):
     # Phase 8: Graph for Tab Activity
     makeGraph(Tab_df)
 else:
-    # Tab_df = pd.DataFrame({'Safari Tabs': tab_lst, 'Time Spent on Each Tab': tab_time_lst})
-    # Tab_df = Tab_df.groupby('Safari Tabs')['Time Spent on Each Tab'].sum()
     print("Data length mismatch, can't create Tab DataFrame.")
-    # print(Tab_df)
-    print()
-    print(Window_df)
-
 
 
 # Phase 9: Calculate Productivity
 # Phase 10: Display Productivity Graph
+# At the end of the script
+existing_data.to_csv(csv_file_path, index=False)
 Finish(productive, unproductive)
