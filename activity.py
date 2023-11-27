@@ -42,7 +42,7 @@ def Finish(complete, uncomplete):
 
 # New Phase 2.1: Train ML Model
 # Load the trained model and encoder
-clf = joblib.load('trained_model.pkl')
+clf = joblib.load('trained_logistic_model.pkl')
 encoder = joblib.load('domain_encoder.pkl')
 
 # Phase 3: Initialize Variables
