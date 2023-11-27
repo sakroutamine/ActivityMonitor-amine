@@ -98,6 +98,9 @@ while time.time() < end_time:
             rough_tab_lst.append(current_tab)
             visited_websites.append(domain_name)
 
+            if not domain_name:  # Skip if domain name is empty
+                continue
+
             # Check if domain is not in the DataFrame and get user input
             if domain_name not in existing_data['domain_name'].values:
                 user_input = input(f"Is the website {domain_name} productive? (yes/no): ").strip().lower()
