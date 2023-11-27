@@ -26,20 +26,32 @@ def makeGraph(dataframe):
     plt.tight_layout()
     plt.show()
 
-def Finish(complete, uncomplete):
-    total = complete + uncomplete
-    if total == 0:
+def Finish(tab_lst, tab_time_lst, website_productivity):
+    productive_time = 0
+    unproductive_time = 0
+
+    for website, time_spent, productivity in zip(tab_lst, tab_time_lst, website_productivity):
+        if productivity == 'productive':
+            productive_time += time_spent
+        else:
+            unproductive_time += time_spent
+
+    total_time = productive_time + unproductive_time
+    if total_time == 0:
         print("No data for productivity calculation.")
         return
-    productivity = (complete / total) * 100
-    unproductivity = (uncomplete / total) * 100
-    plt.bar(1, productivity, color='g', width=.5, edgecolor='black')
-    plt.bar(1,unproductivity, bottom=productivity, color='r', width=.5, edgecolor='black')
+
+    productivity_percentage = (productive_time / total_time) * 100
+    unproductivity_percentage = (unproductive_time / total_time) * 100
+
+    plt.bar(1, productivity_percentage, color='g', width=.5, edgecolor='black')
+    plt.bar(1, unproductivity_percentage, bottom=productivity_percentage, color='r', width=.5, edgecolor='black')
     plt.ylabel('Percentage')
     plt.title('Productivity Graph')
-    plt.yticks(np.arange(0, 101, 5))
-    plt.legend(labels=[f'The productivity rate is: {round(productivity, 2)}%', f'The unproductivity rate is: {round(unproductivity, 2)}%'])
+    plt.yticks(np.arange(0, 101, 10))
+    plt.legend(labels=[f'The productivity rate is: {round(productivity_percentage, 2)}%', f'The unproductivity rate is: {round(unproductivity_percentage, 2)}%'])
     plt.show()
+
 
 # New Phase 2.1: Train ML Model
 # Load the trained model and encoder
@@ -147,7 +159,7 @@ Window_df = pd.DataFrame({'Windows': windows, 'Window Times': windows_time_lst})
 Window_df = Window_df.groupby('Windows')['Window Times'].sum()
 
 # Phase 6: Graph for Window Activity
-print(Window_df)
+# print(Window_df)
 makeGraph(Window_df)
 print("Visited websites and their productivity:")
 for website, prod in zip(visited_websites, website_productivity):
@@ -174,4 +186,5 @@ else:
 # Phase 10: Display Productivity Graph
 # At the end of the script
 existing_data.to_csv(csv_file_path, index=False)
-Finish(productive, unproductive)
+# Phase 10: Display Productivity Graph
+Finish(tab_lst, tab_time_lst, website_productivity)
