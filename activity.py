@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import joblib
 
+
 # Phase 2: Define Helper Functions
 def makeGraph(dataframe):
     if dataframe.empty:
@@ -118,14 +119,30 @@ for website, prod in zip(visited_websites, website_productivity):
 # Phase 7: Data Processing for Tabs
 if len(tab_time_lst) > 0:
     del tab_time_lst[0]
+    print(f"Safari Time: {Window_df['Safari']}")
+    print(f"Sum of Time: {sum(tab_time_lst)}")
+    last_tab = Window_df['Safari'] - sum(tab_time_lst)
+    tab_time_lst.append(last_tab)
+    
 tab_lst = [urlparse(i).netloc for i in rough_tab_lst]
+
+print(f"Tab Time List: {tab_time_lst}")
+print(f"Tab Time Len List: {len(tab_time_lst)}")
+print(f"Tab List: {tab_lst}")
+print(f"Tab Len List: {len(tab_lst)}")
+
 if len(tab_lst) == len(tab_time_lst):
     Tab_df = pd.DataFrame({'Safari Tabs': tab_lst, 'Time Spent on Each Tab': tab_time_lst})
     Tab_df = Tab_df.groupby('Safari Tabs')['Time Spent on Each Tab'].sum()
     # Phase 8: Graph for Tab Activity
     makeGraph(Tab_df)
 else:
+    # Tab_df = pd.DataFrame({'Safari Tabs': tab_lst, 'Time Spent on Each Tab': tab_time_lst})
+    # Tab_df = Tab_df.groupby('Safari Tabs')['Time Spent on Each Tab'].sum()
     print("Data length mismatch, can't create Tab DataFrame.")
+    # print(Tab_df)
+    print()
+    print(Window_df)
 
 
 
