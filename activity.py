@@ -51,6 +51,7 @@ start_window, start_tab, productive, unproductive = 0, 0 , 0, 0
 rough_tab_lst, visited_websites, website_productivity, windows, tab_time_lst, windows_time_lst = [], [], [], [], [], []
 timer = int(input("Timer in seconds: "))
 end_time = time.time() + timer
+new_domains = {}
 # New Phase 3.1: Initialize Productivity Variables
 
 
