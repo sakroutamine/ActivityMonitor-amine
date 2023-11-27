@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import joblib
 
+
 # Phase 2: Define Helper Functions
 def makeGraph(dataframe):
     if dataframe.empty:
