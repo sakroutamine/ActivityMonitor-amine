@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import joblib
-from frontend import show_popup
+
 
 # Phase 2: Define Helper Functions
 def makeGraph(dataframe):
@@ -76,7 +76,7 @@ new_domains = {}
 user_defined_productivity = {}
 
 # New Phase 3.1: Initialize Productivity Variables
-popup_response = None 
+
 
 # Phase 4: Data Collection Loop
 prediction = [None]
@@ -98,13 +98,13 @@ while time.time() < end_time:
             rough_tab_lst.append(current_tab)
             visited_websites.append(domain_name)
 
-            # if not domain_name:  # Skip if domain name is empty
-            #     continue
+            if not domain_name:  # Skip if domain name is empty
+                continue
 
             # Check if domain is not in the DataFrame and get user input
             if domain_name not in existing_data['domain_name'].values:
-                # Show the popup to get user input
-                is_productive = 1 if show_popup(domain_name) else 0
+                user_input = input(f"Is the website {domain_name} productive? (yes/no): ").strip().lower()
+                is_productive = 1 if user_input == 'yes' else 0
                 user_defined_productivity[domain_name] = is_productive
                 new_row = pd.DataFrame({'domain_name': [domain_name], 'is_productive': [is_productive]})
                 existing_data = pd.concat([existing_data, new_row], ignore_index=True)
