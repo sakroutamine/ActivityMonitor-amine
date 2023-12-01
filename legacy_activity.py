@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import joblib
-
+from chatgpt import ask_chatgpt
 
 # Phase 2: Define Helper Functions
 def makeGraph(dataframe):
@@ -167,6 +167,12 @@ makeGraph(Window_df)
 print("Visited websites and their productivity:")
 for website, prod in zip(visited_websites, website_productivity):
     print(f"{website}: {prod}")
+
+#Return api
+api_key = "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"
+chatgpt_response = ask_chatgpt(api_key)
+print(chatgpt_response)
+
 
 # Phase 7: Data Processing for Tabs
 if len(tab_time_lst) > 0:
